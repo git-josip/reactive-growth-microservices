@@ -1,1 +1,1 @@
-rootProject.name = "backendinterview"
+rootProject.name = "reactive-growth"

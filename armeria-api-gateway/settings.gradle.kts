@@ -1,4 +1,4 @@
-rootProject.name = "backend-code-project"
+rootProject.name = "armeria-api-gateway"
 
 include("server")
 
