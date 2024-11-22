@@ -307,8 +307,13 @@ tasks.jacocoTestReport {
 }
 
 dockerCompose {
-	useComposeFiles = listOf("docker/postgres/docker-compose-postgres.yml")
-	startedServices = listOf("postgres-finmid")
+	useComposeFiles = listOf("docker-compose.yaml")
+	startedServices = listOf(
+		"postgres-reactive-growth",
+		"zookeeper-reactive-growth",
+		"kafka-reactive-growth",
+		"kafka-ui-reactive-growth",
+	)
 
 	// this is needed in case of Docker not found error.
 	// https://github.com/avast/gradle-docker-compose-plugin/issues/435

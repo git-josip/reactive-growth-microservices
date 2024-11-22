@@ -20,6 +20,7 @@ class SecurityConfiguration {
                 exchanges
                     .pathMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .pathMatchers("/api/v1/users/signup").permitAll()
+                    .pathMatchers("/api/v1/**").permitAll()
                     .anyExchange().authenticated()
             }
             .httpBasic(Customizer.withDefaults())
