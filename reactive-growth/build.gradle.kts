@@ -9,14 +9,14 @@ group = "com.finmid"
 version = "0.0.1-SNAPSHOT"
 
 plugins {
-	alias(libs.plugins.kotlin.jvm)
-	alias(libs.plugins.kotlin.spring)
-	alias(libs.plugins.spring.boot)
-	alias(libs.plugins.dependency.management)
-	alias(libs.plugins.jacoco)
-	alias(libs.plugins.flyway)
-	alias(libs.plugins.jooq.codegen)
-	alias(libs.plugins.avast.docker.compose)
+	id("org.jetbrains.kotlin.jvm") version "2.0.21"
+	id("org.jetbrains.kotlin.plugin.spring") version "2.0.21"
+	id("org.springframework.boot") version "3.3.5"
+	id("io.spring.dependency-management") version "1.1.6"
+	id("jacoco")
+	id("org.flywaydb.flyway") version "10.17.3"
+	id("org.jooq.jooq-codegen-gradle") version "3.19.15"
+	id("com.avast.gradle.docker-compose") version "0.17.10"
 }
 
 java {
@@ -31,59 +31,58 @@ repositories {
 
 buildscript {
 	dependencies {
-		classpath(libs.postgresql)
-		classpath(libs.flyway.database.postgresql)
-		classpath(libs.testcontainers.postgresql)
+		classpath("org.postgresql:postgresql:42.7.4")
+		classpath("org.flywaydb:flyway-database-postgresql:10.17.3")
+		classpath("org.testcontainers:postgresql:1.20.3")
 	}
 }
 
 dependencies {
-	implementation(libs.spring.boot.starter.actuator)
-	implementation(libs.spring.boot.starter.data.r2dbc)
-	implementation(libs.spring.boot.starter.jooq)
-	implementation(libs.spring.boot.starter.webflux)
-	implementation(libs.spring.boot.starter.security)
-	implementation(libs.springdoc.openapi.starter.webflux)
-	implementation(libs.spring.boot.configuration.processor)
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	implementation("org.springframework.boot:spring-boot-starter-jooq")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.6.0")
+	implementation("org.springframework.boot:spring-boot-configuration-processor")
 
-	implementation(libs.jackson.module.kotlin)
-	implementation(libs.reactor.kotlin.extensions)
-	implementation(libs.kotlin.reflect)
-	implementation(libs.kotlinx.coroutines.reactor)
-	implementation(libs.kotlinx.coroutines.reactive)
-	implementation(libs.kotlinx.coroutines.core)
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.1")
+	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.9.0")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
-	implementation(libs.flyway.core)
-	implementation(libs.flyway.database.postgresql)
+	implementation("org.flywaydb:flyway-core:10.17.3")
+	implementation("org.flywaydb:flyway-database-postgresql:10.17.3")
 
-	runtimeOnly(libs.postgresql)
-	runtimeOnly(libs.r2dbc.postgresql)
+	runtimeOnly("org.postgresql:postgresql:42.7.4")
+	runtimeOnly("org.postgresql:r2dbc-postgresql")
 
-
-	implementation(libs.jooq)
-	implementation(libs.jooq.meta)
-	implementation(libs.jooq.codegen)
-	implementation(libs.jooq.kotlin.coroutines)
+	implementation("org.jooq:jooq:3.19.15")
+	implementation("org.jooq:jooq-meta:3.19.15")
+	implementation("org.jooq:jooq-codegen:3.19.15")
+	implementation("org.jooq:jooq-kotlin-coroutines:3.19.15")
 	implementation("org.springframework.kafka:spring-kafka")
 	implementation("org.apache.kafka:kafka-clients")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-	implementation(libs.jool)
-	implementation(libs.testcontainers.postgresql)
+	implementation("org.jooq:jool:0.9.15")
+	implementation("org.testcontainers:postgresql:1.20.3")
 
-	testImplementation(libs.spring.boot.starter.test)
-	testImplementation(libs.kotlin.test.junit5)
-	testImplementation(libs.junit.jupiter)
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.0.21")
+	testImplementation("org.junit.jupiter:junit-jupiter")
 
-	testImplementation(libs.spring.boot.starter.test)
-	testImplementation(libs.spring.boot.testcontainers)
-	testImplementation(libs.reactor.test)
-	testImplementation(libs.kotlin.test.junit5)
-	testImplementation(libs.testcontainers.junit.jupiter)
-	testImplementation(libs.testcontainers.postgresql)
-	testImplementation(libs.testcontainers.r2dbc)
-	testRuntimeOnly(libs.junit.platform.launcher)
-	testImplementation(libs.kotlinx.coroutines.test)
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("io.projectreactor:reactor-test")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.0.21")
+	testImplementation("org.testcontainers:junit-jupiter:1.20.3")
+	testImplementation("org.testcontainers:postgresql:1.20.3")
+	testImplementation("org.testcontainers:r2dbc:1.20.3")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 }
 
@@ -185,7 +184,7 @@ tasks.named("jooqCodegen").configure {
 }
 
 jacoco {
-	toolVersion = libs.versions.jacoco.get()
+	toolVersion = "0.8.12"
 	reportsDirectory = layout.buildDirectory.dir("customJacocoReportDir")
 }
 
