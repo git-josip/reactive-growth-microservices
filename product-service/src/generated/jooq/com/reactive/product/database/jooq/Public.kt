@@ -4,10 +4,8 @@
 package com.reactive.product.database.jooq
 
 
-import com.reactive.product.database.jooq.tables.Accounts
 import com.reactive.product.database.jooq.tables.FlywaySchemaHistory
-import com.reactive.product.database.jooq.tables.Transactions
-import com.reactive.product.database.jooq.tables.Users
+import com.reactive.product.database.jooq.tables.Products
 
 import kotlin.collections.List
 
@@ -30,31 +28,19 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     }
 
     /**
-     * The table <code>public.accounts</code>.
-     */
-    val ACCOUNTS: Accounts get() = Accounts.ACCOUNTS
-
-    /**
      * The table <code>public.flyway_schema_history</code>.
      */
     val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory get() = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
 
     /**
-     * The table <code>public.transactions</code>.
+     * The table <code>public.products</code>.
      */
-    val TRANSACTIONS: Transactions get() = Transactions.TRANSACTIONS
-
-    /**
-     * The table <code>public.users</code>.
-     */
-    val USERS: Users get() = Users.USERS
+    val PRODUCTS: Products get() = Products.PRODUCTS
 
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
-        Accounts.ACCOUNTS,
         FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
-        Transactions.TRANSACTIONS,
-        Users.USERS
+        Products.PRODUCTS
     )
 }

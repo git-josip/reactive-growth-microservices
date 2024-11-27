@@ -1,6 +1,5 @@
 package com.reactive.product.common.exception.handler
 
-import com.reactive.product.common.exception.AccountStateChangedException
 import com.reactive.product.common.exception.NotFoundException
 import com.reactive.product.common.exception.ValidationException
 import com.reactive.product.common.exception.dto.response.ErrorResponse
@@ -33,18 +32,6 @@ class ApiErrorHandler : ResponseEntityExceptionHandler() {
                     ErrorResponse(
                         errorMsg = "Validation failed",
                         errors = exception.errors
-                    )
-                )
-        )
-
-    @ExceptionHandler(AccountStateChangedException::class)
-    fun handleAccountStateChangedException(exception: AccountStateChangedException): Mono<ResponseEntity<ErrorResponse>> =
-        Mono.just(
-            ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(
-                    ErrorResponse(
-                        errorMsg = "The transaction could not be completed because the account state has changed. Please try again.",
                     )
                 )
         )
