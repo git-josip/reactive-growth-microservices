@@ -46,11 +46,9 @@ class ProductJooqRepositoryImpl: IProductJooqRepository {
     override suspend fun insert(product: ProductsRecord, config: Configuration): ProductsRecord {
         val sql = DSL.using(config).insertInto(
             PRODUCTS,
-            PRODUCTS.ID,
             PRODUCTS.NAME,
             PRODUCTS.CATEGORY,
         ).values(
-            product.id,
             product.name.lowercase(),
             product.category.uppercase()
         ).returning()

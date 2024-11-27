@@ -65,12 +65,11 @@ dependencies {
 
 	implementation("io.grpc:grpc-protobuf:1.68.1")
 	implementation("io.grpc:grpc-netty-shaded:1.68.1")
-	implementation("io.grpc:grpc-stub:1.68.1")
+//	implementation("io.grpc:grpc-stub:1.68.1")
 	implementation("com.google.protobuf:protobuf-java:4.28.3")
 	implementation("javax.annotation:javax.annotation-api:1.3.2")
 	implementation("net.devh:grpc-spring-boot-starter:3.1.0.RELEASE")
-
-//	runtimeOnly("io.grpc:grpc-kotlin-stub:1.4.1")
+	implementation("io.grpc:grpc-kotlin-stub:1.4.1")
 
 	implementation("org.jooq:jooq:3.19.15")
 	implementation("org.jooq:jooq-meta:3.19.15")
@@ -108,6 +107,9 @@ protobuf {
 		id("grpc") {
 			artifact = "io.grpc:protoc-gen-grpc-java:1.68.1"
 		}
+		id("grpckt") {
+			artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar"
+		}
 	}
 
 	tasks.getByName("clean") {
@@ -118,6 +120,7 @@ protobuf {
 		all().forEach { task: GenerateProtoTask ->
 			task.plugins {
 				id("grpc")
+				id("grpckt")
 			}
 		}
 	}
@@ -170,7 +173,7 @@ sourceSets.main {
 		"src/main/kotlin",
 		"src/generated/jooq",
 		"${generatedFilesBaseDir}/main/java",
-		"${generatedFilesBaseDir}/main/grpc"
+		"${generatedFilesBaseDir}/main/grpckt"
 	)
 }
 
@@ -242,6 +245,7 @@ tasks.compileTestKotlin {
 }
 
 tasks.compileKotlin {
+	dependsOn("generateProto")
 	compilerOptions.javaParameters = true
 	setSource()
 }
