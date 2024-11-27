@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.reactive.product.module.product.grpc.dto";
+option java_outer_classname = "ProductProto";
+
+package product;
+
+message ValidationError {
+  string field = 1;
+  string message = 2;
+}
+message ErrorResponse {
+  string errorMsg = 1;
+  repeated ValidationError errors = 2;
+}
+
+message ProductResponse {
+  int64 id = 1;
+  string name = 2;
+  string category = 3;
+}
+
+message CreateProductRequest {
+  string name = 1;
+  string category = 2;
+}
+message GetByIdRequest {
+  int64 id = 1;
+}
+
+service ProductService {
+  rpc CreateProduct(CreateProductRequest) returns (ProductResponse);
+  rpc GetProductById(GetByIdRequest) returns (ProductResponse);
+}

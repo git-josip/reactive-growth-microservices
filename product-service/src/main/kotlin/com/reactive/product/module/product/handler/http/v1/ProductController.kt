@@ -1,4 +1,4 @@
-package com.reactive.product.module.product.controller.v1
+package com.reactive.product.module.product.handler.http.v1
 
 import com.reactive.product.common.pagination.mapper.toPaginationResponse
 import com.reactive.product.common.pagination.response.PaginationResponse
