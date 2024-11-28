@@ -12,6 +12,7 @@ group = "com.reactive.product"
 version = "0.0.1-SNAPSHOT"
 
 plugins {
+//	application
 	id("org.jetbrains.kotlin.jvm") version "2.0.21"
 	id("org.jetbrains.kotlin.plugin.spring") version "2.0.21"
 	id("org.springframework.boot") version "3.3.5"
@@ -21,6 +22,7 @@ plugins {
 	id("org.jooq.jooq-codegen-gradle") version "3.19.15"
 	id("com.avast.gradle.docker-compose") version "0.17.10"
 	id("com.google.protobuf") version "0.9.4"
+//	id("com.gradleup.shadow") version "8.3.3"
 }
 
 java {
@@ -97,6 +99,10 @@ dependencies {
 	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 }
+
+//application {
+//	mainClass = "com.reactive.product.ProductServiceApplicationKt"
+//}
 
 val generatedFilesBaseDir = "$buildDir/generated/source/proto"
 protobuf {

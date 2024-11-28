@@ -12,6 +12,8 @@ import com.linecorp.armeria.common.HttpMethod
 import com.linecorp.armeria.common.kotlin.asCoroutineContext
 import com.linecorp.armeria.common.metric.MeterIdPrefixFunction
 import com.linecorp.armeria.server.*
+import com.linecorp.armeria.server.annotation.JacksonRequestConverterFunction
+import com.linecorp.armeria.server.annotation.JacksonResponseConverterFunction
 import com.linecorp.armeria.server.cors.CorsService
 import com.linecorp.armeria.server.encoding.DecodingService
 import com.linecorp.armeria.server.encoding.EncodingService
@@ -59,6 +61,8 @@ object ServerConfiguration {
 
             // TimeZoneDbExternalService
             .annotatedService()
+            .requestConverters(JacksonRequestConverterFunction(ObjectMapperConfiguration.jacksonObjectMapper))
+            .responseConverters(JacksonResponseConverterFunction(ObjectMapperConfiguration.jacksonObjectMapper))
             .pathPrefix(PRODUCTS_PATH_PREFIX)
             .applyApiKeyAuthDecorator()
             .applyCommonLogDecorator()

@@ -1,70 +1,46 @@
 version: '3.8'
 
 services:
-  eureka-server:
-    image: netflixoss/eureka:latest
-    container_name: eureka-server
-    ports:
-      - "8761:8761"
-    environment:
-      - EUREKA_INSTANCE_HOSTNAME=eureka-server
-      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
-      - EUREKA_CLIENT_FETCH_REGISTRY=false
-      - EUREKA_SERVER_ENABLE_SELF_PRESERVATION=false
-    networks:
-      - reactive-network
-
-  postgres-reactive-growth:
+  postgres-reactive:
+    container_name: postgres-reactive
     image: postgres:16-alpine
     ports:
       - "7432:5432"
     environment:
-      - "POSTGRES_DB=finmid"
+      - "POSTGRES_DB=product"
       - "POSTGRES_USERNAME=postgres"
       - "POSTGRES_PASSWORD=strongpassword"
     restart: always
     networks:
       - reactive-network
 
-  zookeeper-reactive-growth:
-    image: confluentinc/cp-zookeeper:7.7.1
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+  product:
+    container_name: product
+    build: product-service
+    depends_on:
+      - postgres-reactive
     ports:
-      - "2181:2181"
+      - "7071:7071"
+      - "7001:7001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - R2DBC_URL=r2dbc:postgresql://postgres-reactive:5432/product
+      - JDBC_URL=jdbc:postgresql://postgres-reactive:5432/product
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=strongpassword
     networks:
       - reactive-network
 
-  kafka-reactive-growth:
-    image: confluentinc/cp-kafka:7.7.1
+  api-gateway:
+    container_name: api-gateway
+    build: armeria-api-gateway
     depends_on:
-      - zookeeper-reactive-growth
+      - product
     ports:
-      - "9092:9092"
-      - "29092:29092"
+      - "5555:5555"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper-reactive-growth:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-reactive-growth:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-    networks:
-      - reactive-network
-
-  kafka-ui-reactive-growth:
-    image: provectuslabs/kafka-ui:latest
-    depends_on:
-      - kafka-reactive-growth
-    ports:
-      - "8888:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-reactive-growth:9092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      - PRODUCT_SERVICE_GRPC_HOST=product
+      - PRODUCT_SERVICE_GRPC_PORT=7071
     networks:
       - reactive-network
 

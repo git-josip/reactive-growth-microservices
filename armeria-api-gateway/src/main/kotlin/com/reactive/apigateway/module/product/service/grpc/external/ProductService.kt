@@ -25,7 +25,7 @@ class ProductService {
     val backoff = Backoff.exponential(1000, 16000).withMaxAttempts(2)
 
 
-    val productGrpcServiceClient: ProductServiceGrpcKt.ProductServiceCoroutineStub = GrpcClients.builder("gproto+http://127.0.0.1:7071/")
+    val productGrpcServiceClient: ProductServiceGrpcKt.ProductServiceCoroutineStub = GrpcClients.builder("gproto+http://$productServiceGrpcHost:$productServiceGrpcPort/")
         .decorator(RetryingClient.newDecorator(retryRule))
         .decorator(ConcurrencyLimitingClient.newDecorator(200))
         .build(ProductServiceGrpcKt.ProductServiceCoroutineStub::class.java)
@@ -54,5 +54,9 @@ class ProductService {
 
     companion object {
         val productDispatcher = Dispatchers.IO.limitedParallelism(200, "productDispatcher")
+
+
+        val productServiceGrpcHost = System.getenv("PRODUCT_SERVICE_GRPC_HOST")!!
+        val productServiceGrpcPort = System.getenv("PRODUCT_SERVICE_GRPC_PORT")!!
     }
 }
