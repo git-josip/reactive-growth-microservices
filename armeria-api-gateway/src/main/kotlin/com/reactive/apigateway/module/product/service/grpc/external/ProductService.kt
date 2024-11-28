@@ -43,6 +43,7 @@ class ProductService {
 
     @Post
     @ProducesJson
+    @ConsumesJson
     @Description("Create product")
     suspend fun createProduct(request: CreateProductRequest): com.reactive.apigateway.module.product.dto.response.ProductResponse {
         return withContext(productDispatcher) {
@@ -56,7 +57,7 @@ class ProductService {
         val productDispatcher = Dispatchers.IO.limitedParallelism(200, "productDispatcher")
 
 
-        val productServiceGrpcHost = System.getenv("PRODUCT_SERVICE_GRPC_HOST")!!
-        val productServiceGrpcPort = System.getenv("PRODUCT_SERVICE_GRPC_PORT")!!
+        val productServiceGrpcHost = System.getenv("PRODUCT_SERVICE_GRPC_HOST") ?: "localhost"
+        val productServiceGrpcPort = System.getenv("PRODUCT_SERVICE_GRPC_PORT") ?: "7071"
     }
 }
