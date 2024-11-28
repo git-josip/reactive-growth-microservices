@@ -59,7 +59,7 @@ dependencies {
 }
 
 application {
-    mainClass = "com.gradle.develocity.assignment.MyServerKt"
+    mainClass = "com.reactive.apigateway.MyServerKt"
 }
 
 val generatedFilesBaseDir = "$buildDir/generated/source/proto"
@@ -125,7 +125,7 @@ sourceSets.main {
 tasks.register<JavaExec>("start") {
     dependsOn("generateProto")
     classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("com.gradle.develocity.assignment.MyServerKt")
+    mainClass.set("com.reactive.apigateway.MyServerKt")
 }
 
 tasks.test {
