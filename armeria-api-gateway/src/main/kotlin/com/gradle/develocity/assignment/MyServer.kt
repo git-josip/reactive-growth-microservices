@@ -12,7 +12,7 @@ private const val KOTLINX_COROUTINES_DEBUG_PROPERTY_NAME = "kotlinx.coroutines.d
 private val SERVER_HTTP_PORT = ApplicationPropertiesUtils.getProperty("server.http.port").convert<Int>()
 private val SERVER_HTTPS_PORT = ApplicationPropertiesUtils.getProperty("server.https.port").convert<Int>()
 private val KOTLINX_COROUTINES_DEBUG = ApplicationPropertiesUtils.getProperty(KOTLINX_COROUTINES_DEBUG_PROPERTY_NAME)
-private val TIMEZONES_RATE_LIMIT = ApplicationPropertiesUtils.getProperty("timezone.db.rate-limit").convert<Long>()
+private val PRODUCTS_RATE_LIMIT = ApplicationPropertiesUtils.getProperty("products.rate-limit").convert<Long>()
 
 suspend fun main() {
     System.setProperty(KOTLINX_COROUTINES_DEBUG_PROPERTY_NAME, KOTLINX_COROUTINES_DEBUG)
@@ -21,7 +21,7 @@ suspend fun main() {
     .https(SERVER_HTTPS_PORT)
     .tlsSelfSigned()
 
-    ServerConfiguration.configureServices(serverBuilder, TIMEZONES_RATE_LIMIT)
+    ServerConfiguration.configureServices(serverBuilder, PRODUCTS_RATE_LIMIT)
     val server =  serverBuilder.build()
     server.closeOnJvmShutdown()
     server.start().join()

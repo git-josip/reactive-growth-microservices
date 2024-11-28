@@ -1,6 +1,7 @@
 package com.reactive.product.common.exception.handler
 
 import com.google.rpc.Status
+import com.reactive.product.common.configuration.ObjectMapperConfiguration
 import io.grpc.protobuf.StatusProto
 import com.reactive.product.common.exception.NotFoundException
 import com.reactive.product.common.exception.ValidationException
@@ -29,7 +30,7 @@ class GrpcExceptionAdvice {
 
         val status = Status.newBuilder()
             .setCode(io.grpc.Status.INVALID_ARGUMENT.code.value())
-            .setMessage(errorResponse.toString())
+            .setMessage(ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(errorResponse))
             .build()
 
         return StatusProto.toStatusException(status).status

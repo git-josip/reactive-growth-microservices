@@ -1,4 +1,4 @@
-package com.reactive.product
+package com.gradle.develocity
 
 import org.junit.jupiter.api.Test
 

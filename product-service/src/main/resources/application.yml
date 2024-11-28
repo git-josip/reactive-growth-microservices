@@ -26,5 +26,10 @@ logging:
     r2dbc: DEBUG
     sql: TRACE
     web: DEBUG
+    io.grpc: DEBUG
+    io.grpc.netty: DEBUG
+    io.grpc.protobuf: DEBUG
+    io.grpc.stub: DEBUG
+    net.devh.boot.grpc: DEBUG
   group:
     r2dbc: 'org.springframework.r2dbc,org.springframework.data.r2dbc'

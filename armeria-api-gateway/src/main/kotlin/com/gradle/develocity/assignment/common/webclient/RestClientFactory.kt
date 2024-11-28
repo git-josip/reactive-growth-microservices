@@ -20,7 +20,7 @@ import com.linecorp.armeria.common.metric.MeterIdPrefixFunction
 object RestClientFactory {
     private val REQUEST_DEBUG = ApplicationPropertiesUtils.getProperty("request.debug").convert<Boolean>()
 
-    val clientFactory = ClientFactory.builder()
+    private val clientFactory = ClientFactory.builder()
         .maxNumEventLoopsPerEndpoint(16)
         .maxNumEventLoopsPerHttp1Endpoint(16)
         .build()

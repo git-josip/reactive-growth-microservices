@@ -1,6 +1,6 @@
 package com.reactive.product
 
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 
 class DummyIntegrationTest {
     @Test

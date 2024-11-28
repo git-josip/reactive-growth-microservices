@@ -1,6 +1,8 @@
+import com.google.protobuf.gradle.GenerateProtoTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.google.protobuf.gradle.id
 
 plugins {
     kotlin("jvm") version "2.0.21"
@@ -9,6 +11,7 @@ plugins {
     jacoco
     id("org.sonarqube") version "5.0.0.4638"
     id("com.gradleup.shadow") version "8.3.3"
+    id("com.google.protobuf") version "0.9.4"
 }
 
 repositories {
@@ -26,6 +29,7 @@ dependencies {
     implementation("com.linecorp.armeria:armeria")
     implementation("com.linecorp.armeria:armeria-logback")
     implementation("com.linecorp.armeria:armeria-kotlin")
+    implementation("com.linecorp.armeria:armeria-grpc")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("com.aayushatharva.brotli4j:brotli4j:$brotliVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.0")
@@ -35,6 +39,14 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion")
 
     implementation("io.reactivex.rxjava3:rxjava:3.1.9")
+
+    implementation("io.grpc:grpc-protobuf:1.68.1")
+    implementation("io.grpc:grpc-netty-shaded:1.68.1")
+//	implementation("io.grpc:grpc-stub:1.68.1")
+    implementation("com.google.protobuf:protobuf-java:4.28.3")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("net.devh:grpc-spring-boot-starter:3.1.0.RELEASE")
+    implementation("io.grpc:grpc-kotlin-stub:1.4.1")
 
     runtimeOnly("org.slf4j:log4j-over-slf4j:2.0.16")
     runtimeOnly("ch.qos.logback:logback-core:1.5.11")
@@ -50,28 +62,68 @@ application {
     mainClass = "com.gradle.develocity.assignment.MyServerKt"
 }
 
+val generatedFilesBaseDir = "$buildDir/generated/source/proto"
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.28.3"
+    }
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.68.1"
+        }
+        id("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar"
+        }
+    }
+
+    tasks.getByName("clean") {
+        delete(generatedFilesBaseDir)
+    }
+
+    generateProtoTasks {
+        all().forEach { task: GenerateProtoTask ->
+            task.plugins {
+                id("grpc")
+                id("grpckt")
+            }
+        }
+    }
+
+    generatedFilesBaseDir = generatedFilesBaseDir
+}
+
 jacoco {
     toolVersion = "0.8.12"
     reportsDirectory = layout.buildDirectory.dir("customJacocoReportDir")
 }
 
 tasks.compileKotlin {
+    dependsOn("generateProto")
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
     }
-}
-
-tasks.compileTestKotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
-    }
-}
-
-tasks.compileKotlin {
     compilerOptions.javaParameters = true
 }
 
+tasks.compileTestKotlin {
+    dependsOn("generateProto")
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
+}
+
+
+sourceSets.main {
+    kotlin.srcDirs(
+        "src/main/kotlin",
+        "${generatedFilesBaseDir}/main/java",
+        "${generatedFilesBaseDir}/main/grpckt"
+    )
+}
+
+
 tasks.register<JavaExec>("start") {
+    dependsOn("generateProto")
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("com.gradle.develocity.assignment.MyServerKt")
 }

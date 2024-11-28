@@ -3,8 +3,6 @@ package com.gradle.develocity.assignment.common.exception.handler
 import com.gradle.develocity.assignment.common.configuration.ObjectMapperConfiguration
 import com.gradle.develocity.assignment.common.exception.ValidationException
 import com.gradle.develocity.assignment.common.exception.response.ErrorResponse
-import com.gradle.develocity.assignment.module.timezone.dto.response.Timezones
-import com.linecorp.armeria.client.InvalidResponseException
 import com.linecorp.armeria.common.HttpData
 import com.linecorp.armeria.common.HttpRequest
 import com.linecorp.armeria.common.HttpResponse
@@ -31,20 +29,6 @@ class ValidationExceptionHandler : ExceptionHandlerFunction {
                         ErrorResponse(
                             errorMsg = cause.message,
                             errors = cause.errors
-                        )
-                    )
-                )
-            )
-        } else if(cause is InvalidResponseException) {
-            return HttpResponse.of(
-                HttpStatus.BAD_REQUEST,
-                MediaType.JSON,
-                HttpData.ofUtf8(
-                    ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(
-                        Timezones(
-                            success = false,
-                            errorMsg = "Something is wrong with external service invocation",
-                            cities = listOf()
                         )
                     )
                 )
