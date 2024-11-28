@@ -10,11 +10,12 @@ import com.linecorp.armeria.client.retry.RetryRule
 import com.linecorp.armeria.client.retry.RetryingClient
 import com.linecorp.armeria.common.HttpStatus
 import com.linecorp.armeria.server.annotation.*
+import com.reactive.apigateway.common.exception.handler.GrpcExceptionHandler
 import com.reactive.apigateway.grpc.product.GetByIdRequest
 import com.reactive.apigateway.grpc.product.ProductServiceGrpcKt
 import kotlinx.coroutines.*
 
-@ExceptionHandler(com.reactive.apigateway.common.exception.handler.ValidationExceptionHandler::class)
+@ExceptionHandler(GrpcExceptionHandler::class)
 class ProductService {
     val retryRule = RetryRule.onStatus(HttpStatus.SERVICE_UNAVAILABLE)
         .orElse(RetryRule.onStatus(HttpStatus.INTERNAL_SERVER_ERROR))
