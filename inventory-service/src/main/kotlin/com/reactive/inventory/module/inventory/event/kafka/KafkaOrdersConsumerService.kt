@@ -31,7 +31,7 @@ class KafkaOrdersConsumerService(
                         status = "SUCCESS"
                     )
                     kafkaProducerService.sendMessages(
-                        "orders",
+                        "inventory_validation",
                         "${inventoryValidatedEvent.context}-${inventoryValidatedEvent.contextRefId}",
                         ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(inventoryValidatedEvent),
                     )
@@ -45,7 +45,7 @@ class KafkaOrdersConsumerService(
                         details = "Insufficient inventory"
                     )
                     kafkaProducerService.sendMessages(
-                        "orders",
+                        "inventory_validation",
                         "${inventoryValidatedEvent.context}-${inventoryValidatedEvent.contextRefId}",
                         ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(inventoryValidatedEvent),
                     )

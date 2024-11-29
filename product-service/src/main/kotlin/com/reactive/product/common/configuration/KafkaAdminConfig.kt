@@ -1,4 +1,4 @@
-package com.reactive.inventory.common.configuration
+package com.reactive.product.common.configuration
 
 import org.apache.kafka.clients.admin.AdminClient
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties

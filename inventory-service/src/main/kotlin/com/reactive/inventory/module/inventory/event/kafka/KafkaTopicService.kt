@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 class KafkaTopicService(private val adminClient: AdminClient) {
     @PostConstruct
     fun createTopicIfNotExists() {
-        val topicName = "transactions"
+        val topicName = "inventory_validation"
         val topics = adminClient.listTopics().names().get()
         if (!topics.contains(topicName)) {
             val newTopic = NewTopic(topicName, 5, 1.toShort())
