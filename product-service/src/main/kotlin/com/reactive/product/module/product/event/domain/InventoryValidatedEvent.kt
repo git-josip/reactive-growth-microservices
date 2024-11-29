@@ -1,4 +1,4 @@
-package com.reactive.order.module.order.event.domain
+package com.reactive.product.module.product.event.domain
 
 data class InventoryValidatedEvent(
     val context: String,

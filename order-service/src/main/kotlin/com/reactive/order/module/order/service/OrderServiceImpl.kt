@@ -56,11 +56,11 @@ class OrderServiceImpl(
     }
 
     override suspend fun orderUpdated(order: Order) {
-        val orderCreatedEvent = order.toOrderUpdatedEvent()
+        val orderUpdatedEvent = order.toOrderUpdatedEvent()
         kafkaProducerService.sendMessages(
             "orders",
-            orderCreatedEvent.orderId.toString(),
-            ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(orderCreatedEvent),
+            orderUpdatedEvent.orderId.toString(),
+            ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(orderUpdatedEvent),
         )
     }
 }

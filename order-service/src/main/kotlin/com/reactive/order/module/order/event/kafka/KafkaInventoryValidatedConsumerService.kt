@@ -15,15 +15,17 @@ class KafkaInventoryValidatedConsumerService(
     suspend fun listen(record: ConsumerRecord<String, String>) {
         val inventoryValidated = ObjectMapperConfiguration.jacksonObjectMapper.readValue(record.value(), InventoryValidatedEvent::class.java)
 
-        orderService.tryGetById(inventoryValidated.orderId)?.let {order ->
-            val updatedOrder = orderService.update(
-                order.copy(
-                    status = inventoryValidated.status,
-                    details = inventoryValidated.details
+        if(inventoryValidated.context == "ORDER") {
+            orderService.tryGetById(inventoryValidated.contextRefId)?.let {order ->
+                val updatedOrder = orderService.update(
+                    order.copy(
+                        status = inventoryValidated.status,
+                        details = inventoryValidated.details
+                    )
                 )
-            )
 
-            orderService.orderUpdated(updatedOrder)
+                orderService.orderUpdated(updatedOrder)
+            }
         }
     }
 
