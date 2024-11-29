@@ -4,17 +4,10 @@
 package com.reactive.order.database.jooq.tables.references
 
 
-import com.reactive.order.database.jooq.tables.Accounts
 import com.reactive.order.database.jooq.tables.FlywaySchemaHistory
-import com.reactive.order.database.jooq.tables.Transactions
-import com.reactive.order.database.jooq.tables.Users
+import com.reactive.order.database.jooq.tables.Orders
 
 
-
-/**
- * The table <code>public.accounts</code>.
- */
-val ACCOUNTS: Accounts = Accounts.ACCOUNTS
 
 /**
  * The table <code>public.flyway_schema_history</code>.
@@ -22,11 +15,6 @@ val ACCOUNTS: Accounts = Accounts.ACCOUNTS
 val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
 
 /**
- * The table <code>public.transactions</code>.
+ * The table <code>public.orders</code>.
  */
-val TRANSACTIONS: Transactions = Transactions.TRANSACTIONS
-
-/**
- * The table <code>public.users</code>.
- */
-val USERS: Users = Users.USERS
+val ORDERS: Orders = Orders.ORDERS
