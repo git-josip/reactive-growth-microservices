@@ -8,4 +8,7 @@ data class CreateProductRequest(
 
     @Description("product category")
     val category: String,
+
+    @Description("product quantity")
+    val quantity: Int
 )

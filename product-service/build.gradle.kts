@@ -168,6 +168,10 @@ tasks.register("tc-stop") {
 	}
 }
 
+tasks.getByName("bootJar") {
+	dependsOn("generateProto")
+}
+
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
@@ -254,6 +258,10 @@ tasks.compileKotlin {
 	dependsOn("generateProto")
 	compilerOptions.javaParameters = true
 	setSource()
+}
+
+tasks.compileJava {
+	dependsOn("generateProto")
 }
 
 tasks.test {

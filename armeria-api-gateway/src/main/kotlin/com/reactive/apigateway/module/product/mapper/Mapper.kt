@@ -14,5 +14,6 @@ fun CreateProductRequest.toGrpcCreateProductRequest(): com.reactive.apigateway.g
     return com.reactive.apigateway.grpc.product.CreateProductRequest.newBuilder()
         .setName(this.name)
         .setCategory(this.category)
+        .setQuantity(this.quantity)
         .build()
 }

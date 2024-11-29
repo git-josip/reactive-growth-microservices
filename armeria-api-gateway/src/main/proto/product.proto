@@ -24,6 +24,7 @@ message ProductResponse {
 message CreateProductRequest {
   string name = 1;
   string category = 2;
+  int32 quantity = 3;
 }
 message GetByIdRequest {
   int64 id = 1;

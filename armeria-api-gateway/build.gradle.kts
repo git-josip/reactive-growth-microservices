@@ -52,6 +52,7 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-core:1.5.11")
     runtimeOnly("ch.qos.logback:logback-classic:1.5.11")
     runtimeOnly("com.aayushatharva.brotli4j:native-osx-aarch64:$brotliVersion")
+    runtimeOnly("com.aayushatharva.brotli4j:native-linux-aarch64:$brotliVersion")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params")
@@ -96,6 +97,15 @@ jacoco {
     toolVersion = "0.8.12"
     reportsDirectory = layout.buildDirectory.dir("customJacocoReportDir")
 }
+
+tasks.compileJava {
+    dependsOn("generateProto")
+}
+
+tasks.getByName("shadowJar") {
+    dependsOn("generateProto")
+}
+
 
 tasks.compileKotlin {
     dependsOn("generateProto")
