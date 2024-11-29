@@ -13,7 +13,7 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
   application:
-    name: finmid-backend-interview
+    name: order-service
   r2dbc:
     url: ${R2DBC_URL:r2dbc:postgresql://localhost:7432/finmid}
     username: ${DB_USERNAME:postgres}

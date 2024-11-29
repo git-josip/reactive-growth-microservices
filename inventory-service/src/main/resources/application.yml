@@ -4,7 +4,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092
     consumer:
-      group-id: account-service-group
+      group-id: inventory-service
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -13,7 +13,7 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
   application:
-    name: finmid-backend-interview
+    name: inventory-service
   r2dbc:
     url: ${R2DBC_URL:r2dbc:postgresql://localhost:7432/finmid}
     username: ${DB_USERNAME:postgres}
