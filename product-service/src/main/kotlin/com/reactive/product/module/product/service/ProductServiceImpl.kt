@@ -1,9 +1,12 @@
 package com.reactive.product.module.product.service
 
+import com.reactive.product.common.configuration.ObjectMapperConfiguration
 import com.reactive.product.common.jooq.DslContextTransactionAware
 import com.reactive.product.module.product.domain.Product
 import com.reactive.product.module.product.domain.ProductCreate
+import com.reactive.product.module.product.event.kafka.KafkaProducerService
 import com.reactive.product.module.product.mapper.toProduct
+import com.reactive.product.module.product.mapper.toProductCreatedEvent
 import com.reactive.product.module.product.mapper.toProductsRecord
 import com.reactive.product.module.product.repository.IProductJooqRepository
 import com.reactive.product.module.product.validation.ProductCreateValidator
@@ -17,15 +20,24 @@ import org.springframework.stereotype.Service
 class ProductServiceImpl(
     private val productRepository: IProductJooqRepository,
     private val productCreateValidator: ProductCreateValidator,
+    private val kafkaProducerService: KafkaProducerService,
     override val dslContext: DSLContext
 ) : IProductService, DslContextTransactionAware {
     override suspend fun create(productCreate: ProductCreate): Product {
         return transactional { config: Configuration ->
             productCreateValidator.validate(productCreate, config).failOnError()
 
-            productRepository
+            val productCreated = productRepository
                 .insert(productCreate.toProductsRecord(), config)
                 .toProduct()
+
+            kafkaProducerService.sendMessages(
+                "products",
+                productCreated.id.toString(),
+                ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(productCreated.toProductCreatedEvent(productCreate.quantity))
+            )
+
+            productCreated
         }
     }
 

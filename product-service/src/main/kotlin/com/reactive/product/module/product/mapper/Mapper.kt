@@ -7,6 +7,7 @@ import com.reactive.product.module.product.domain.Product
 import com.reactive.product.module.product.domain.ProductCreate
 import com.reactive.product.module.product.dto.request.ProductCreateRequest
 import com.reactive.product.module.product.dto.response.ProductResponse
+import com.reactive.product.module.product.event.domain.ProductCreatedEvent
 import com.reactive.product.module.product.grpc.dto.CreateProductRequest
 
 fun ProductsRecord.toProduct(): Product {
@@ -34,17 +35,27 @@ fun Product.toGrpcProductResponse(): com.reactive.product.module.product.grpc.dt
 
 }
 
+fun Product.toProductCreatedEvent(quantity: Int): ProductCreatedEvent {
+    return ProductCreatedEvent(
+        productId = this.id,
+         quantity = quantity
+    )
+
+}
+
 fun ProductCreateRequest.toProductCreate(): ProductCreate {
     return ProductCreate(
         name = this.name,
-        category = this.category
+        category = this.category,
+        quantity = this.quantity
     )
 }
 
 fun CreateProductRequest.toProductCreate(): ProductCreate {
     return ProductCreate(
         name = this.name,
-        category = this.category
+        category = this.category,
+        quantity = this.quantity
     )
 }
 

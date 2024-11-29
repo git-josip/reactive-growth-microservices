@@ -28,5 +28,14 @@ class ProductCreateValidator(private val productJooqRepository: IProductJooqRepo
                 )
             )
         }
+
+        if(item.quantity <= 0) {
+            errors.add(
+                ValidationError(
+                    field = ProductCreate::quantity.name,
+                    message = "The product quantity must be greater than 0."
+                )
+            )
+        }
     }
 }
