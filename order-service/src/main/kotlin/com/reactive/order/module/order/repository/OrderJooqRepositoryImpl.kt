@@ -18,15 +18,15 @@ class OrderJooqRepositoryImpl: IOrderJooqRepository {
             val dslContext = DSL.using(config)
             val sql = dslContext.insertInto(
                 ORDERS,
-                ORDERS.ID,
                 ORDERS.PRODUCT_ID,
                 ORDERS.QUANTITY,
-                ORDERS.PRICE
+                ORDERS.PRICE,
+                ORDERS.STATUS
             ).values(
-                order.id,
                 order.productId,
                 order.quantity,
-                order.price
+                order.price,
+                order.status
             ).returning()
 
             Mono

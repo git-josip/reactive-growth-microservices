@@ -13,6 +13,8 @@ import com.linecorp.armeria.server.annotation.*
 import com.reactive.apigateway.common.exception.handler.GrpcExceptionHandler
 import com.reactive.apigateway.grpc.product.GetByIdRequest
 import com.reactive.apigateway.grpc.product.ProductServiceGrpcKt
+import com.reactive.apigateway.module.product.dto.request.CreateOrderRequest
+import com.reactive.apigateway.module.product.mapper.toGrpcCreateOrderRequest
 import kotlinx.coroutines.*
 
 @ExceptionHandler(GrpcExceptionHandler::class)
@@ -50,6 +52,21 @@ class ProductService {
             productGrpcServiceClient.createProduct(
                 request.toGrpcCreateProductRequest()
             ).toDomainProductResponse()
+        }
+    }
+
+    @Post("/{id}/order")
+    @ProducesJson
+    @ConsumesJson
+    @Description("Create order")
+    suspend fun createOrder(
+        @Param("id") productId: Long,
+        request: CreateOrderRequest
+    ) {
+        return withContext(productDispatcher) {
+            productGrpcServiceClient.createOrder(
+                request.toGrpcCreateOrderRequest(productId)
+            )
         }
     }
 

@@ -1,3 +1,5 @@
+import com.google.protobuf.gradle.GenerateProtoTask
+import com.google.protobuf.gradle.id
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -17,6 +19,7 @@ plugins {
 	id("org.flywaydb.flyway") version "10.17.3"
 	id("org.jooq.jooq-codegen-gradle") version "3.19.15"
 	id("com.avast.gradle.docker-compose") version "0.17.10"
+	id("com.google.protobuf") version "0.9.4"
 }
 
 java {
@@ -59,6 +62,13 @@ dependencies {
 	runtimeOnly("org.postgresql:postgresql:42.7.4")
 	runtimeOnly("org.postgresql:r2dbc-postgresql")
 
+	implementation("io.grpc:grpc-protobuf:1.68.1")
+	implementation("io.grpc:grpc-netty-shaded:1.68.1")
+	implementation("com.google.protobuf:protobuf-java:4.28.3")
+	implementation("javax.annotation:javax.annotation-api:1.3.2")
+	implementation("net.devh:grpc-spring-boot-starter:3.1.0.RELEASE")
+	implementation("io.grpc:grpc-kotlin-stub:1.4.1")
+
 	implementation("org.jooq:jooq:3.19.15")
 	implementation("org.jooq:jooq-meta:3.19.15")
 	implementation("org.jooq:jooq-codegen:3.19.15")
@@ -84,6 +94,36 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+}
+
+val generatedFilesBaseDir = "$buildDir/generated/source/proto"
+protobuf {
+	protoc {
+		artifact = "com.google.protobuf:protoc:4.28.3"
+	}
+	plugins {
+		id("grpc") {
+			artifact = "io.grpc:protoc-gen-grpc-java:1.68.1"
+		}
+		id("grpckt") {
+			artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar"
+		}
+	}
+
+	tasks.getByName("clean") {
+		delete(generatedFilesBaseDir)
+	}
+
+	generateProtoTasks {
+		all().forEach { task: GenerateProtoTask ->
+			task.plugins {
+				id("grpc")
+				id("grpckt")
+			}
+		}
+	}
+
+	generatedFilesBaseDir = generatedFilesBaseDir
 }
 
 tasks.register("tc-start") {
@@ -120,16 +160,26 @@ tasks.register("tc-stop") {
 	}
 }
 
+tasks.getByName("bootJar") {
+	dependsOn("generateProto")
+}
+
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
 	}
 }
 
+tasks.compileJava {
+	dependsOn("generateProto")
+}
+
 sourceSets.main {
-	java.srcDirs(
+	kotlin.srcDirs(
 		"src/main/kotlin",
-		"src/generated/jooq"
+		"src/generated/jooq",
+		"${generatedFilesBaseDir}/main/java",
+		"${generatedFilesBaseDir}/main/grpckt"
 	)
 }
 
@@ -189,20 +239,15 @@ jacoco {
 }
 
 tasks.compileKotlin {
-	compilerOptions {
-		jvmTarget.set(JvmTarget.JVM_21)
-	}
+	dependsOn("generateProto")
+	compilerOptions.javaParameters = true
+	setSource()
 }
 
 tasks.compileTestKotlin {
 	compilerOptions {
 		jvmTarget.set(JvmTarget.JVM_21)
 	}
-}
-
-tasks.compileKotlin {
-	compilerOptions.javaParameters = true
-	setSource()
 }
 
 tasks.test {

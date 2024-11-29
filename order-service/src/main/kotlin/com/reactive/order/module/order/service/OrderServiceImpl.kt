@@ -32,9 +32,13 @@ class OrderServiceImpl(
         return transactional { config: Configuration ->
             orderCreateValidator.validate(orderCreate, config).failOnError()
 
-            orderJooqRepository
+            val order = orderJooqRepository
                 .insert(orderCreate.toOrdersRecord(), config)
                 .toOrder()
+
+            this.orderCreated(order)
+
+            order
         }
     }
 

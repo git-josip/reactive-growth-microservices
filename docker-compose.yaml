@@ -60,6 +60,7 @@ services:
       - postgres-reactive
       - kafka-reactive
     ports:
+      - "7073:7073"
       - "7003:7003"
     environment:
       - SPRING_PROFILES_ACTIVE=docker

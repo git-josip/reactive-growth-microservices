@@ -2,13 +2,16 @@ package com.reactive.product.module.product.service
 
 import com.reactive.product.common.configuration.ObjectMapperConfiguration
 import com.reactive.product.common.jooq.DslContextTransactionAware
+import com.reactive.product.module.product.domain.OrderCreate
 import com.reactive.product.module.product.domain.Product
 import com.reactive.product.module.product.domain.ProductCreate
 import com.reactive.product.module.product.event.kafka.KafkaProducerService
+import com.reactive.product.module.product.mapper.toInitOrderEvent
 import com.reactive.product.module.product.mapper.toProduct
 import com.reactive.product.module.product.mapper.toProductCreatedEvent
 import com.reactive.product.module.product.mapper.toProductsRecord
 import com.reactive.product.module.product.repository.IProductJooqRepository
+import com.reactive.product.module.product.validation.OrderCreateValidator
 import com.reactive.product.module.product.validation.ProductCreateValidator
 import org.jooq.Configuration
 import org.jooq.DSLContext
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service
 class ProductServiceImpl(
     private val productRepository: IProductJooqRepository,
     private val productCreateValidator: ProductCreateValidator,
+    private val orderCreateValidator: OrderCreateValidator,
     private val kafkaProducerService: KafkaProducerService,
     override val dslContext: DSLContext
 ) : IProductService, DslContextTransactionAware {
@@ -38,6 +42,18 @@ class ProductServiceImpl(
             )
 
             productCreated
+        }
+    }
+
+    override suspend fun createOrder(orderCreate: OrderCreate) {
+        transactional { config: Configuration ->
+            orderCreateValidator.validate(orderCreate, config).failOnError()
+
+            kafkaProducerService.sendMessages(
+                "orders",
+                orderCreate.productId.toString(),
+                ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(orderCreate.toInitOrderEvent())
+            )
         }
     }
 

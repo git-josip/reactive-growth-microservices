@@ -17,7 +17,7 @@ class KafkaOrdersConsumerService(
     suspend fun listen(record: ConsumerRecord<String, String>) {
         val order = ObjectMapperConfiguration.jacksonObjectMapper.readValue(record.value(), OrderEvent::class.java)
 
-        if(order.status == "CREATED") {
+        if(order.status == "PROCESSING") {
             inventoryService.tryGetByProductId(order.productId)?.let { inventory ->
                 if(inventory.quantity >= order.quantity) {
                     val newInventory = inventory.copy(quantity = inventory.quantity - order.quantity)

@@ -48,9 +48,11 @@ class ProductJooqRepositoryImpl: IProductJooqRepository {
             PRODUCTS,
             PRODUCTS.NAME,
             PRODUCTS.CATEGORY,
+            PRODUCTS.PRICE,
         ).values(
             product.name.lowercase(),
-            product.category.uppercase()
+            product.category.uppercase(),
+            product.price
         ).returning()
 
         return Mono.from(sql)

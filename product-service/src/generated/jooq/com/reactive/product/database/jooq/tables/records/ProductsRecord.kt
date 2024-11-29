@@ -6,6 +6,8 @@ package com.reactive.product.database.jooq.tables.records
 
 import com.reactive.product.database.jooq.tables.Products
 
+import java.math.BigDecimal
+
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 
@@ -28,6 +30,10 @@ open class ProductsRecord private constructor() : UpdatableRecordImpl<ProductsRe
         set(value): Unit = set(2, value)
         get(): String = get(2) as String
 
+    open var price: BigDecimal
+        set(value): Unit = set(3, value)
+        get(): BigDecimal = get(3) as BigDecimal
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -37,10 +43,11 @@ open class ProductsRecord private constructor() : UpdatableRecordImpl<ProductsRe
     /**
      * Create a detached, initialised ProductsRecord
      */
-    constructor(id: Long? = null, name: String, category: String): this() {
+    constructor(id: Long? = null, name: String, category: String, price: BigDecimal): this() {
         this.id = id
         this.name = name
         this.category = category
+        this.price = price
         resetChangedOnNotNull()
     }
 }

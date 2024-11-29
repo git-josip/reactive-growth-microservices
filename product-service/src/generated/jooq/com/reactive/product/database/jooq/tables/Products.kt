@@ -8,6 +8,8 @@ import com.reactive.product.database.jooq.Public
 import com.reactive.product.database.jooq.keys.PRODUCTS_PKEY
 import com.reactive.product.database.jooq.tables.records.ProductsRecord
 
+import java.math.BigDecimal
+
 import kotlin.collections.Collection
 
 import org.jooq.Condition
@@ -83,6 +85,11 @@ open class Products(
      * The column <code>public.products.category</code>.
      */
     val CATEGORY: TableField<ProductsRecord, String?> = createField(DSL.name("category"), SQLDataType.VARCHAR(255).nullable(false), this, "")
+
+    /**
+     * The column <code>public.products.price</code>.
+     */
+    val PRICE: TableField<ProductsRecord, BigDecimal?> = createField(DSL.name("price"), SQLDataType.NUMERIC(15, 2).nullable(false), this, "")
 
     private constructor(alias: Name, aliased: Table<ProductsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<ProductsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)

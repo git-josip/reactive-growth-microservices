@@ -22,7 +22,6 @@ plugins {
 	id("org.jooq.jooq-codegen-gradle") version "3.19.15"
 	id("com.avast.gradle.docker-compose") version "0.17.10"
 	id("com.google.protobuf") version "0.9.4"
-//	id("com.gradleup.shadow") version "8.3.3"
 }
 
 java {
@@ -67,7 +66,6 @@ dependencies {
 
 	implementation("io.grpc:grpc-protobuf:1.68.1")
 	implementation("io.grpc:grpc-netty-shaded:1.68.1")
-//	implementation("io.grpc:grpc-stub:1.68.1")
 	implementation("com.google.protobuf:protobuf-java:4.28.3")
 	implementation("javax.annotation:javax.annotation-api:1.3.2")
 	implementation("net.devh:grpc-spring-boot-starter:3.1.0.RELEASE")
