@@ -4,6 +4,10 @@ grpc:
 server:
   port: 7003
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
   endpoints:
     web:
       exposure:
@@ -21,6 +25,7 @@ management:
     port: 7773
 spring:
   sleuth:
+    enabled: true
     messaging:
       kafka:
         enabled: true
