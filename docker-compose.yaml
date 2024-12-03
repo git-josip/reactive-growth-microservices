@@ -22,7 +22,9 @@ services:
     depends_on:
       - postgres-reactive
       - kafka-reactive
+      - zipkin-reactive
     ports:
+      - "7771:7771"
       - "7071:7071"
       - "7001:7001"
     environment:
@@ -32,6 +34,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
+      - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
     networks:
       - reactive-network
 
@@ -41,8 +44,11 @@ services:
     depends_on:
       - postgres-reactive
       - kafka-reactive
+      - zipkin-reactive
     ports:
       - "7002:7002"
+      - "7772:7772"
+      - "7072:7072"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - R2DBC_URL=r2dbc:postgresql://postgres-reactive:5432/inventory
@@ -50,6 +56,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
+      - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
     networks:
       - reactive-network
 
@@ -59,9 +66,11 @@ services:
     depends_on:
       - postgres-reactive
       - kafka-reactive
+      - zipkin-reactive
     ports:
-      - "7073:7073"
       - "7003:7003"
+      - "7773:7773"
+      - "7073:7073"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - R2DBC_URL=r2dbc:postgresql://postgres-reactive:5432/orders
@@ -69,6 +78,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
+      - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
     networks:
       - reactive-network
 
@@ -77,6 +87,7 @@ services:
     build: armeria-api-gateway
     depends_on:
       - product
+      - zipkin-reactive
     ports:
       - "5555:5555"
     environment:
@@ -129,6 +140,52 @@ services:
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
     networks:
       - reactive-network
+
+  prometheus-reactive:
+    image: prom/prometheus
+    volumes:
+      - "./docker-compose-init/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./docker-compose-init/prometheus/rules.yml:/etc/prometheus/rules.yml"
+    networks:
+      - reactive-network
+    ports:
+      - 9090:9090
+
+  grafana-reactive:
+    image: grafana/grafana
+    networks:
+      - reactive-network
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ./docker-compose-init/grafana/:/etc/grafana/provisioning/datasources
+
+  node-exporter:
+    image: prom/node-exporter
+    networks:
+      - reactive-network
+    ports:
+      - 9100:9100
+
+  alert-manager:
+    image: prom/alertmanager
+    networks:
+      - reactive-network
+    ports:
+      - 9093:9093
+
+  zipkin-reactive:
+    image: openzipkin/zipkin:3.4.2
+    container_name: zipkin
+    networks:
+      - reactive-network
+    ports:
+      - "9411:9411"
 
 networks:
   reactive-network:

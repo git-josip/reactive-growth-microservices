@@ -15,6 +15,7 @@ import com.reactive.product.module.product.validation.OrderCreateValidator
 import com.reactive.product.module.product.validation.ProductCreateValidator
 import org.jooq.Configuration
 import org.jooq.DSLContext
+import org.springframework.cloud.sleuth.annotation.NewSpan
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -45,6 +46,7 @@ class ProductServiceImpl(
         }
     }
 
+    @NewSpan("create-order")
     override suspend fun createOrder(orderCreate: OrderCreate) {
         transactional { config: Configuration ->
             orderCreateValidator.validate(orderCreate, config).failOnError()

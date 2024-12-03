@@ -11,10 +11,10 @@ import reactor.core.publisher.Hooks
 @EnableR2dbcRepositories
 @OpenAPIDefinition
 @ConfigurationPropertiesScan
-class InventoryServiceApplication
+class OrderServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<InventoryServiceApplication>(*args)
+	runApplication<OrderServiceApplication>(*args)
 	Hooks.enableAutomaticContextPropagation()
 }
 

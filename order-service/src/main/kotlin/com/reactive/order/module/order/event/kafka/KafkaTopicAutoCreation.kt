@@ -13,8 +13,13 @@ class KafkaTopicAutoCreation(private val adminClient: AdminClient) {
         val topics = adminClient.listTopics().names().get()
         if (!topics.contains(topicName)) {
             val newTopic = NewTopic(topicName, 5, 1.toShort())
-            adminClient.createTopics(listOf(newTopic)).all().get()
-            println("Topic '$topicName' created")
+            try {
+                adminClient.createTopics(listOf(newTopic)).all().get()
+                println("Topic '$topicName' created")
+            } catch (e: Exception) {
+                println("Error creating topic '$topicName'")
+                e.printStackTrace()
+            }
         } else {
             println("Topic '$topicName' already exists")
         }
