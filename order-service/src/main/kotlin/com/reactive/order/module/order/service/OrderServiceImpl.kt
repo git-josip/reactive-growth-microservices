@@ -11,7 +11,7 @@ import com.reactive.order.module.order.validation.OrderCreateValidator
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.kotlin.coroutines.transactionCoroutine
-import org.springframework.cloud.sleuth.annotation.ContinueSpan
+import org.springframework.cloud.sleuth.annotation.NewSpan
 import org.springframework.stereotype.Service
 
 @Service
@@ -29,7 +29,7 @@ class OrderServiceImpl(
         }
     }
 
-    @ContinueSpan(log = "OrderService.create")
+    @NewSpan("OrderService.create")
     override suspend fun create(orderCreate: OrderCreate): Order {
         return transactional { config: Configuration ->
             orderCreateValidator.validate(orderCreate, config).failOnError()
@@ -61,7 +61,7 @@ class OrderServiceImpl(
         )
     }
 
-    @ContinueSpan(log = "OrderService.orderUpdated")
+    @NewSpan("OrderService.orderUpdated")
     override suspend fun orderUpdated(order: Order) {
         val orderUpdatedEvent = order.toOrderUpdatedEvent()
         kafkaProducerService.sendMessages(
