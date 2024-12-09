@@ -1,5 +1,4 @@
 import com.google.protobuf.gradle.GenerateProtoTask
-import com.google.protobuf.gradle.GenerateProtoTask.PluginOptions
 import com.google.protobuf.gradle.id
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -43,6 +42,8 @@ buildscript {
 }
 
 dependencies {
+	implementation("io.opentelemetry.javaagent:opentelemetry-javaagent:2.10.0")
+
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
 	implementation("org.springframework.boot:spring-boot-starter-jooq")

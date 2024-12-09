@@ -1,6 +1,9 @@
 # Build stage
 FROM gradle:8.10-jdk21 AS build
 
+# Install tools
+RUN apt-get update && apt-get install -y curl
+
 # Set the working directory
 WORKDIR /app
 
@@ -13,9 +16,13 @@ COPY settings.gradle.kts /app/settings.gradle.kts
 # Copy the source code
 COPY src /app/src
 
+# Download the OpenTelemetry Java agent
+RUN curl -L -o /app/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+
+
 # Build the application
 RUN #./gradlew shadowJar
-RUN ./gradlew clean bootJar -x test
+RUN gradle clean bootJar -x test
 
 # Run stage
 FROM eclipse-temurin:21-jre-alpine
@@ -25,9 +32,10 @@ WORKDIR /app
 
 # Copy the built jar from the build stage
 COPY --from=build /app/build/libs/product-service-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=build /app/opentelemetry-javaagent.jar /app/opentelemetry-javaagent.jar
 
 # Expose the application port
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-javaagent:/app/opentelemetry-javaagent.jar", "-jar", "/app/app.jar"]

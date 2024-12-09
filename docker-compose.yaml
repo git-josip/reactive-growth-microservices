@@ -38,6 +38,10 @@ services:
       - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
       - LOGSTASH_HOST=logstash-reactive
       - LOGSTASH_PORT=5044
+      - OTEL_TRACES_EXPORTER=logging
+      - OTEL_METRICS_EXPORTER=logging
+      - OTEL_LOGS_EXPORTER=logging
+      - OTEL_METRIC_EXPORT_INTERVAL=15000
     networks:
       - reactive-network
 
