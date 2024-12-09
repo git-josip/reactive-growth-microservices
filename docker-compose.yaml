@@ -23,6 +23,7 @@ services:
       - postgres-reactive
       - kafka-reactive
       - zipkin-reactive
+      - logstash-reactive
     ports:
       - "7771:7771"
       - "7071:7071"
@@ -35,6 +36,8 @@ services:
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
       - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
+      - LOGSTASH_HOST=logstash-reactive
+      - LOGSTASH_PORT=5044
     networks:
       - reactive-network
 
@@ -57,6 +60,8 @@ services:
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
       - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
+      - LOGSTASH_HOST=logstash-reactive
+      - LOGSTASH_PORT=5044
     networks:
       - reactive-network
 
@@ -67,6 +72,7 @@ services:
       - postgres-reactive
       - kafka-reactive
       - zipkin-reactive
+      - logstash-reactive
     ports:
       - "7003:7003"
       - "7773:7773"
@@ -79,6 +85,8 @@ services:
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
       - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
+      - LOGSTASH_HOST=logstash-reactive
+      - LOGSTASH_PORT=5044
     networks:
       - reactive-network
 
@@ -88,6 +96,7 @@ services:
     depends_on:
       - product
       - zipkin-reactive
+      - logstash-reactive
     ports:
       - "5555:5555"
     environment:
@@ -186,6 +195,57 @@ services:
       - reactive-network
     ports:
       - "9411:9411"
+
+  elasticsearch-reactive:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
+    container_name: elasticsearch-reactive
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - reactive-network
+
+  logstash-reactive:
+    image: docker.elastic.co/logstash/logstash:8.16.1
+    container_name: logstash-reactive
+    environment:
+      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ./docker-compose-init/logstash:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"
+    depends_on:
+      - elasticsearch-reactive
+    networks:
+      - reactive-network
+
+  kibana-reactive:
+    image: docker.elastic.co/kibana/kibana:8.16.1
+    container_name: kibana-reactive
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch-reactive
+    networks:
+      - reactive-network
+
+volumes:
+  esdata:
+    driver: local
 
 networks:
   reactive-network:

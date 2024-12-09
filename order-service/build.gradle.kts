@@ -58,6 +58,8 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.6.0")
 	implementation("org.springframework.boot:spring-boot-configuration-processor")
 
+	implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.1")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
