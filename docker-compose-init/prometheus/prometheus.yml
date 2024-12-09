@@ -32,3 +32,11 @@ scrape_configs:
           - 'host.docker.internal:7771'
           - 'host.docker.internal:7772'
           - 'host.docker.internal:7773'
+  - job_name: 'spring-otel-services'
+    scheme: http
+    metrics_path: '/metrics'
+    static_configs:
+      - targets:
+          - 'host.docker.internal:7771'
+          - 'host.docker.internal:7772'
+          - 'host.docker.internal:7773'

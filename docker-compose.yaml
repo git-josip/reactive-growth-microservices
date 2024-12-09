@@ -24,6 +24,7 @@ services:
       - kafka-reactive
       - zipkin-reactive
       - logstash-reactive
+      - jaeger-reactive
     ports:
       - "7771:7771"
       - "7071:7071"
@@ -38,10 +39,12 @@ services:
       - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
       - LOGSTASH_HOST=logstash-reactive
       - LOGSTASH_PORT=5044
-      - OTEL_TRACES_EXPORTER=logging
+      - OTEL_TRACES_EXPORTER=otlp
       - OTEL_METRICS_EXPORTER=logging
       - OTEL_LOGS_EXPORTER=logging
       - OTEL_METRIC_EXPORT_INTERVAL=15000
+      - OTEL_RESOURCE_ATTRIBUTES=service=product-service,env=dev
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger-reactive:4318
     networks:
       - reactive-network
 
@@ -246,6 +249,20 @@ services:
       - elasticsearch-reactive
     networks:
       - reactive-network
+
+  jaeger-reactive:
+    image: jaegertracing/all-in-one:1.64.0
+    container_name: jaeger-reactive
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    restart: always
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - reactive-network
+
 
 volumes:
   esdata:
