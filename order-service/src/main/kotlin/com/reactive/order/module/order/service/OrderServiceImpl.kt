@@ -70,4 +70,12 @@ class OrderServiceImpl(
             ObjectMapperConfiguration.jacksonObjectMapper.writeValueAsString(orderUpdatedEvent),
         )
     }
+
+    override suspend fun getByProductId(productId: Long): List<Order> {
+        return transactional { config: Configuration ->
+            orderJooqRepository
+                .findByProductId(productId, config)
+                .map { it.toOrder() }
+        }
+    }
 }

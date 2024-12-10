@@ -99,7 +99,7 @@ fun Order.toGrpcOrderResponse(): com.reactive.order.module.order.grpc.dto.OrderR
         .setQuantity(this.quantity)
         .setPrice(this.price.toString())
         .setStatus(this.status)
-        .setDetails(this.details)
+        .setDetails(this.details ?: "")
         .setCreatedAt(
             com.google.protobuf.Timestamp.newBuilder()
                 .setSeconds(this.createdAt.toEpochSecond(ZoneOffset.UTC))

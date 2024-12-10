@@ -19,4 +19,10 @@ class OrderGrpcServiceImpl(
         return orderService.getById(request.id)
             .toGrpcOrderResponse()
     }
+
+    override suspend fun getAllByProductId(request: GetAllByProductIdRequest): OrderArrayResponse {
+        return orderService.getByProductId(request.productId)
+            .map { it.toGrpcOrderResponse() }
+            .let { OrderArrayResponse.newBuilder().addAllOrders(it).build() }
+    }
 }

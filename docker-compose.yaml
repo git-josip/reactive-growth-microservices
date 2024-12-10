@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres-reactive:
     container_name: postgres-reactive
@@ -112,6 +110,10 @@ services:
     environment:
       - PRODUCT_SERVICE_GRPC_HOST=product
       - PRODUCT_SERVICE_GRPC_PORT=7071
+      - INVENTORY_SERVICE_GRPC_HOST=inventory
+      - INVENTORY_SERVICE_GRPC_PORT=7072
+      - ORDER_SERVICE_GRPC_HOST=order
+      - ORDER_SERVICE_GRPC_PORT=7073
       - OTEL_SERVICE_NAME=armeria-api-gateway-service
       - OTEL_RESOURCE_ATTRIBUTES=service=armeria-api-gateway-service,env=dev
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-reactive:4317

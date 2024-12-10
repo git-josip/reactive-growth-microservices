@@ -10,4 +10,7 @@
     <root level="info">
         <appender-ref ref="console" />
     </root>
+    <logger name="com.reactive" level="debug" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
 </configuration>

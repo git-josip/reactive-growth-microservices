@@ -10,6 +10,7 @@ interface IOrderService {
     suspend fun update(order: Order): Order
     suspend fun orderCreated(order: Order)
     suspend fun orderUpdated(order: Order)
+    suspend fun getByProductId(productId: Long): List<Order>
 
     suspend fun getById(id: Long): Order {
         return tryGetById(id) ?: throw NotFoundException("Order with id '$id' does not exist")

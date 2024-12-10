@@ -33,6 +33,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("com.aayushatharva.brotli4j:brotli4j:$brotliVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("com.bucket4j:bucket4j-core:8.10.1")
     // error on self signed tls
     implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
