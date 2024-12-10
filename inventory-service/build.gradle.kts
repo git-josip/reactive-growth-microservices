@@ -38,6 +38,10 @@ buildscript {
 }
 
 dependencies {
+	implementation("io.opentelemetry.javaagent:opentelemetry-javaagent:2.10.0")
+	implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.45.0")
+	runtimeOnly("io.opentelemetry.instrumentation:opentelemetry-spring-webflux-5.3:2.10.0-alpha")
+
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
 	implementation("org.springframework.boot:spring-boot-starter-jooq")

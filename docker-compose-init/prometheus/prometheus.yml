@@ -24,19 +24,12 @@ scrape_configs:
     static_configs:
       - targets:
           - 'host.docker.internal:5555'
-  - job_name: 'spring-services'
+  - job_name: otel_collector
+    honor_timestamps: true
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /metrics
     scheme: http
-    metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
-          - 'host.docker.internal:7771'
-          - 'host.docker.internal:7772'
-          - 'host.docker.internal:7773'
-  - job_name: 'spring-otel-services'
-    scheme: http
-    metrics_path: '/metrics'
-    static_configs:
-      - targets:
-          - 'host.docker.internal:7771'
-          - 'host.docker.internal:7772'
-          - 'host.docker.internal:7773'
+          - otel-collector-reactive:8888

@@ -23,8 +23,8 @@ services:
       - postgres-reactive
       - kafka-reactive
       - zipkin-reactive
-      - logstash-reactive
       - jaeger-reactive
+      - otel-collector-reactive
     ports:
       - "7771:7771"
       - "7071:7071"
@@ -36,15 +36,12 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
-      - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
-      - LOGSTASH_HOST=logstash-reactive
-      - LOGSTASH_PORT=5044
-      - OTEL_TRACES_EXPORTER=otlp
-      - OTEL_METRICS_EXPORTER=logging
-      - OTEL_LOGS_EXPORTER=logging
-      - OTEL_METRIC_EXPORT_INTERVAL=15000
+      - OTEL_SERVICE_NAME=product-service
       - OTEL_RESOURCE_ATTRIBUTES=service=product-service,env=dev
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger-reactive:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-reactive:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_METRIC_EXPORT_INTERVAL=15000
     networks:
       - reactive-network
 
@@ -67,8 +64,12 @@ services:
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
       - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
-      - LOGSTASH_HOST=logstash-reactive
-      - LOGSTASH_PORT=5044
+      - OTEL_SERVICE_NAME=inventory-service
+      - OTEL_RESOURCE_ATTRIBUTES=service=inventory-service,env=dev
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-reactive:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_METRIC_EXPORT_INTERVAL=15000
     networks:
       - reactive-network
 
@@ -79,7 +80,6 @@ services:
       - postgres-reactive
       - kafka-reactive
       - zipkin-reactive
-      - logstash-reactive
     ports:
       - "7003:7003"
       - "7773:7773"
@@ -92,8 +92,12 @@ services:
       - DB_PASSWORD=strongpassword
       - KAFKA_BOOTSTRAP_SERVERS=kafka-reactive:9092
       - ZIPKIN_BASE_URL=http://zipkin-reactive:9411
-      - LOGSTASH_HOST=logstash-reactive
-      - LOGSTASH_PORT=5044
+      - OTEL_SERVICE_NAME=order-service
+      - OTEL_RESOURCE_ATTRIBUTES=service=order-service,env=dev
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-reactive:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_METRIC_EXPORT_INTERVAL=15000
     networks:
       - reactive-network
 
@@ -103,7 +107,6 @@ services:
     depends_on:
       - product
       - zipkin-reactive
-      - logstash-reactive
     ports:
       - "5555:5555"
     environment:
@@ -149,7 +152,7 @@ services:
     depends_on:
       - kafka-reactive
     ports:
-      - "8888:8080"
+      - "9099:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-reactive:9092
@@ -157,11 +160,64 @@ services:
     networks:
       - reactive-network
 
-  prometheus-reactive:
+  otel-collector-reactive:
+    container_name: otel-collector-reactive
+    image: otel/opentelemetry-collector-contrib:0.100.0
+#    image: otel/opentelemetry-collector-contrib:0.91.0
+#    command:
+#      - --config=/etc/otelcol-contrib/otel-collector.yml
+    volumes:
+      - ./docker-compose-init/otel-collector/opentelemetry-collector.yml:/etc/otelcol-contrib/config.yaml
+    restart: always
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP http receiver
+      - "8889:8889" # Prometheus exporter metrics
+      - "8888:8888"
+      - "55679:55679"
+    depends_on:
+      - loki-reactive
+      - jaeger-reactive
+      - zipkin-reactive
+      - tempo-reactive
+    networks:
+      - reactive-network
+
+  tempo-reactive:
+    container_name: tempo-reactive
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./docker-compose-init/tempo/tempo.yml:/etc/tempo.yml
+    restart: always
+    ports:
+      - "4317"  # otlp grpc
+      - "3200"  # tempo as grafana datasource
+    networks:
+      - reactive-network
+
+  loki-reactive:
+    container_name: loki-reactive
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+    ports:
+      - "3100"
+    networks:
+      - reactive-network
+
+  promeprometheus-reactive:
+    container_name: prometheus-reactive
     image: prom/prometheus
     volumes:
       - "./docker-compose-init/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
       - "./docker-compose-init/prometheus/rules.yml:/etc/prometheus/rules.yml"
+    command:
+      - "--web.enable-remote-write-receiver"
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--enable-feature=exemplar-storage"
+    depends_on:
+      - otel-collector-reactive
     networks:
       - reactive-network
     ports:
@@ -203,52 +259,53 @@ services:
     ports:
       - "9411:9411"
 
-  elasticsearch-reactive:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
-    container_name: elasticsearch-reactive
-    environment:
-      - node.name=es01
-      - cluster.name=es-docker-cluster
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - xpack.security.enabled=false
-      - xpack.security.transport.ssl.enabled=false
-      - xpack.security.http.ssl.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    networks:
-      - reactive-network
-
-  logstash-reactive:
-    image: docker.elastic.co/logstash/logstash:8.16.1
-    container_name: logstash-reactive
-    environment:
-      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
-    volumes:
-      - ./docker-compose-init/logstash:/usr/share/logstash/pipeline
-    ports:
-      - "5044:5044"
-    depends_on:
-      - elasticsearch-reactive
-    networks:
-      - reactive-network
-
-  kibana-reactive:
-    image: docker.elastic.co/kibana/kibana:8.16.1
-    container_name: kibana-reactive
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch-reactive
-    networks:
-      - reactive-network
+## this is only used when ELK is implemented, but here with loki elastic is not used.
+#  elasticsearch-reactive:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
+#    container_name: elasticsearch-reactive
+#    environment:
+#      - node.name=es01
+#      - cluster.name=es-docker-cluster
+#      - discovery.type=single-node
+#      - bootstrap.memory_lock=true
+#      - xpack.security.enabled=false
+#      - xpack.security.transport.ssl.enabled=false
+#      - xpack.security.http.ssl.enabled=false
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+#    volumes:
+#      - esdata:/usr/share/elasticsearch/data
+#    ports:
+#      - "9200:9200"
+#    networks:
+#      - reactive-network
+#
+#  logstash-reactive:
+#    image: docker.elastic.co/logstash/logstash:8.16.1
+#    container_name: logstash-reactive
+#    environment:
+#      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
+#    volumes:
+#      - ./docker-compose-init/logstash:/usr/share/logstash/pipeline
+#    ports:
+#      - "5044:5044"
+#    depends_on:
+#      - elasticsearch-reactive
+#    networks:
+#      - reactive-network
+#
+#  kibana-reactive:
+#    image: docker.elastic.co/kibana/kibana:8.16.1
+#    container_name: kibana-reactive
+#    ports:
+#      - "5601:5601"
+#    depends_on:
+#      - elasticsearch-reactive
+#    networks:
+#      - reactive-network
 
   jaeger-reactive:
     image: jaegertracing/all-in-one:1.64.0
@@ -258,8 +315,8 @@ services:
     restart: always
     ports:
       - "16686:16686"
-      - "4317:4317"
-      - "4318:4318"
+      - "4317"
+      - "4318"
     networks:
       - reactive-network
 

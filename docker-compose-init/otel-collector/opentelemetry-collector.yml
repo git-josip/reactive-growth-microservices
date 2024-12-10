@@ -1,0 +1,61 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  # batch metrics before sending to reduce API usage
+  batch:
+    send_batch_max_size: 1000
+    send_batch_size: 100
+    timeout: 10s
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  prometheusremotewrite:
+    endpoint: "http://prometheus-reactive:9090/api/v1/write"
+
+# this not be used with above one prometheusremotewrite, as we do not need to scrape now form prometheus, it is written there direclty from pipline
+#  prometheus:
+#    endpoint: "0.0.0.0:8889"
+#    enable_open_metrics: true
+#    namespace: default
+
+  otlp/jaeger:
+    endpoint: "http://jaeger-reactive:4317"
+    tls:
+      insecure: true
+
+  zipkin:
+    endpoint: http://zipkin:9411/api/v2/spans
+    format: proto
+
+  otlp/tempo:
+    endpoint: "http://tempo-reactive:4317"
+    tls:
+      insecure: true
+
+  loki:
+    endpoint: "http://loki-reactive:3100/loki/api/v1/push"
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheusremotewrite]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/jaeger,zipkin,otlp/tempo]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [loki]
+
+  telemetry:
+    logs:
+      level: "debug"
