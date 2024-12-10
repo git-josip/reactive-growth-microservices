@@ -1,14 +1,14 @@
 spring:
   application:
-    name: finmid-backendinterview
+    name: product-service
   r2dbc:
-    url: 'r2dbc:postgresql://localhost:7432/finmid'
+    url: 'r2dbc:postgresql://localhost:7432/products'
     username: postgres
     password: strongpassword
     pool:
       max-size: 40
   flyway:
-    url: jdbc:postgresql://localhost:7432/finmid
+    url: jdbc:postgresql://localhost:7432/products
     locations: classpath:db/migration
     user: postgres
     password: strongpassword

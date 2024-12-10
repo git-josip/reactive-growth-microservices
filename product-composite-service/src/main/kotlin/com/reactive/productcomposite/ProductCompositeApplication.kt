@@ -11,10 +11,10 @@ import reactor.core.publisher.Hooks
 @EnableR2dbcRepositories
 @OpenAPIDefinition
 @ConfigurationPropertiesScan
-class FinmidBackendInterviewApplication
+class ProductCompositeApplication
 
 fun main(args: Array<String>) {
-	runApplication<FinmidBackendInterviewApplication>(*args)
+	runApplication<ProductCompositeApplication>(*args)
 	Hooks.enableAutomaticContextPropagation()
 }
 

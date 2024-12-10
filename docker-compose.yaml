@@ -148,7 +148,7 @@ services:
 
   kafka-ui-reactive:
     container_name: kafka-ui-reactive
-    image: provectuslabs/kafka-ui:latest
+    image: provectuslabs/kafka-ui:v0.7.2
     depends_on:
       - kafka-reactive
     ports:
@@ -163,9 +163,6 @@ services:
   otel-collector-reactive:
     container_name: otel-collector-reactive
     image: otel/opentelemetry-collector-contrib:0.100.0
-#    image: otel/opentelemetry-collector-contrib:0.91.0
-#    command:
-#      - --config=/etc/otelcol-contrib/otel-collector.yml
     volumes:
       - ./docker-compose-init/otel-collector/opentelemetry-collector.yml:/etc/otelcol-contrib/config.yaml
     restart: always
@@ -208,7 +205,7 @@ services:
 
   promeprometheus-reactive:
     container_name: prometheus-reactive
-    image: prom/prometheus
+    image: prom/prometheus:v3.0.1
     volumes:
       - "./docker-compose-init/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
       - "./docker-compose-init/prometheus/rules.yml:/etc/prometheus/rules.yml"
@@ -238,14 +235,14 @@ services:
       - ./docker-compose-init/grafana/:/etc/grafana/provisioning/datasources
 
   node-exporter:
-    image: prom/node-exporter
+    image: prom/node-exporter:v1.8.2
     networks:
       - reactive-network
     ports:
       - 9100:9100
 
   alert-manager:
-    image: prom/alertmanager
+    image: prom/alertmanager:v0.27.0
     networks:
       - reactive-network
     ports:
@@ -258,54 +255,6 @@ services:
       - reactive-network
     ports:
       - "9411:9411"
-
-## this is only used when ELK is implemented, but here with loki elastic is not used.
-#  elasticsearch-reactive:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
-#    container_name: elasticsearch-reactive
-#    environment:
-#      - node.name=es01
-#      - cluster.name=es-docker-cluster
-#      - discovery.type=single-node
-#      - bootstrap.memory_lock=true
-#      - xpack.security.enabled=false
-#      - xpack.security.transport.ssl.enabled=false
-#      - xpack.security.http.ssl.enabled=false
-#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-#    volumes:
-#      - esdata:/usr/share/elasticsearch/data
-#    ports:
-#      - "9200:9200"
-#    networks:
-#      - reactive-network
-#
-#  logstash-reactive:
-#    image: docker.elastic.co/logstash/logstash:8.16.1
-#    container_name: logstash-reactive
-#    environment:
-#      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
-#    volumes:
-#      - ./docker-compose-init/logstash:/usr/share/logstash/pipeline
-#    ports:
-#      - "5044:5044"
-#    depends_on:
-#      - elasticsearch-reactive
-#    networks:
-#      - reactive-network
-#
-#  kibana-reactive:
-#    image: docker.elastic.co/kibana/kibana:8.16.1
-#    container_name: kibana-reactive
-#    ports:
-#      - "5601:5601"
-#    depends_on:
-#      - elasticsearch-reactive
-#    networks:
-#      - reactive-network
 
   jaeger-reactive:
     image: jaegertracing/all-in-one:1.64.0
