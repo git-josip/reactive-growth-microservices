@@ -10,10 +10,7 @@
         </encoder>
     </appender>
 
-    <root level="${logback.logging.level}">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
-    <logger name="com.gradle.develocity" additivity="false" level="${logback.logging.level}">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
 </configuration>

@@ -112,6 +112,12 @@ services:
     environment:
       - PRODUCT_SERVICE_GRPC_HOST=product
       - PRODUCT_SERVICE_GRPC_PORT=7071
+      - OTEL_SERVICE_NAME=armeria-api-gateway-service
+      - OTEL_RESOURCE_ATTRIBUTES=service=armeria-api-gateway-service,env=dev
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-reactive:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_METRIC_EXPORT_INTERVAL=15000
     networks:
       - reactive-network
 

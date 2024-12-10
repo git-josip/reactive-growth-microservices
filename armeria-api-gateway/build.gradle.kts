@@ -42,11 +42,13 @@ dependencies {
 
     implementation("io.grpc:grpc-protobuf:1.68.1")
     implementation("io.grpc:grpc-netty-shaded:1.68.1")
-//	implementation("io.grpc:grpc-stub:1.68.1")
     implementation("com.google.protobuf:protobuf-java:4.28.3")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
     implementation("net.devh:grpc-spring-boot-starter:3.1.0.RELEASE")
     implementation("io.grpc:grpc-kotlin-stub:1.4.1")
+
+    implementation("io.opentelemetry.javaagent:opentelemetry-javaagent:2.10.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.45.0")
 
     runtimeOnly("org.slf4j:log4j-over-slf4j:2.0.16")
     runtimeOnly("ch.qos.logback:logback-core:1.5.11")
@@ -102,10 +104,12 @@ tasks.compileJava {
     dependsOn("generateProto")
 }
 
-tasks.getByName("shadowJar") {
+tasks.shadowJar {
     dependsOn("generateProto")
+    dependencies {
+        exclude(dependency("io.opentelemetry.javaagent:opentelemetry-javaagent"))
+    }
 }
-
 
 tasks.compileKotlin {
     dependsOn("generateProto")
