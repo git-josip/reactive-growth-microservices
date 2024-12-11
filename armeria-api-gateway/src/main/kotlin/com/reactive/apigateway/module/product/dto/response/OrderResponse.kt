@@ -1,7 +1,6 @@
 package com.reactive.apigateway.module.product.dto.response
 
 import java.math.BigDecimal
-import java.time.LocalDateTime
 
 data class OrderResponse(
     val id: Long,
@@ -10,6 +9,6 @@ data class OrderResponse(
     val price: BigDecimal,
     val status: String,
     val details: String?,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val createdAt: String,
+    val updatedAt: String
 )

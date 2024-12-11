@@ -4,8 +4,10 @@ import com.reactive.apigateway.module.product.dto.request.CreateOrderRequest
 import com.reactive.apigateway.module.product.dto.request.CreateProductRequest
 import com.reactive.apigateway.module.product.dto.response.OrderResponse
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.Instant
 import java.time.ZoneOffset
+
+private val DATE_FORMATTER = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
 
 fun com.reactive.apigateway.grpc.product.ProductResponse.toDomainProductResponse(): com.reactive.apigateway.module.product.dto.response.ProductResponse {
     return com.reactive.apigateway.module.product.dto.response.ProductResponse(
@@ -41,7 +43,7 @@ fun com.reactive.apigateway.grpc.order.OrderResponse.toDomainOrderResponse(): Or
         price = BigDecimal(this.price),
         status = this.status,
         details = this.details,
-        createdAt = LocalDateTime.ofEpochSecond(this.createdAt.seconds, this.createdAt.nanos, ZoneOffset.UTC),
-        updatedAt = LocalDateTime.ofEpochSecond(this.updatedAt.seconds, this.updatedAt.nanos, ZoneOffset.UTC),
+        createdAt = DATE_FORMATTER.format(Instant.ofEpochSecond(this.createdAt.seconds, this.createdAt.nanos.toLong())),
+        updatedAt =  DATE_FORMATTER.format(Instant.ofEpochSecond(this.updatedAt.seconds, this.updatedAt.nanos.toLong())),
     )
 }
