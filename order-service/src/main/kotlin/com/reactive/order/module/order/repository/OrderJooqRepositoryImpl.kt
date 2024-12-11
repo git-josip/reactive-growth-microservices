@@ -84,6 +84,10 @@ class OrderJooqRepositoryImpl: IOrderJooqRepository {
                 .toFlux()
                 .asFlow()
                 .toList()
+
+            // toList is used here as this is place where we need to collect all the results because transaction will be closed later, so I did it here.
+            // Or we cna send tx from controller and collect results there.
+            // But I think here we need to have paginated response to use it effectively or have CQRS and have all data in composite service.
         }
     }
 }
