@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.reactive.apigateway.grpc.common";
+option java_outer_classname = "CommonProto";
+
+package common;
+
+message ValidationError {
+  string field = 1;
+  string message = 2;
+}
+
+message ErrorResponse {
+  string errorMsg = 1;
+  repeated ValidationError errors = 2;
+}

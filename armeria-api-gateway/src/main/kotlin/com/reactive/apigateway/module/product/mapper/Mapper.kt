@@ -18,6 +18,15 @@ fun com.reactive.apigateway.grpc.product.ProductResponse.toDomainProductResponse
     )
 }
 
+fun com.reactive.apigateway.grpc.inventory.InventoryResponse.toDomainInventoryResponse(): com.reactive.apigateway.module.product.dto.response.InventoryResponse {
+    return com.reactive.apigateway.module.product.dto.response.InventoryResponse(
+        quantity = this.quantity,
+        createdAt = DATE_FORMATTER.format(Instant.ofEpochSecond(this.createdAt.seconds, this.createdAt.nanos.toLong())),
+        updatedAt =  DATE_FORMATTER.format(Instant.ofEpochSecond(this.updatedAt.seconds, this.updatedAt.nanos.toLong())),
+    )
+}
+
+
 fun CreateProductRequest.toGrpcCreateProductRequest(): com.reactive.apigateway.grpc.product.CreateProductRequest {
     return com.reactive.apigateway.grpc.product.CreateProductRequest.newBuilder()
         .setName(this.name)

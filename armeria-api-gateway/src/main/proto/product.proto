@@ -1,19 +1,13 @@
 syntax = "proto3";
 
+import "common.proto";
+
 option java_multiple_files = true;
 option java_package = "com.reactive.apigateway.grpc.product";
 option java_outer_classname = "ProductProto";
 
 package product;
 
-message ValidationError {
-  string field = 1;
-  string message = 2;
-}
-message ErrorResponse {
-  string errorMsg = 1;
-  repeated ValidationError errors = 2;
-}
 message ProductResponse {
   int64 id = 1;
   string name = 2;

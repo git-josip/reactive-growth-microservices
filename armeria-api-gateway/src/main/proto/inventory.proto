@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.reactive.apigateway.grpc.inventory";
+option java_outer_classname = "InventoryProto";
+
+package inventory;
+
+message InventoryResponse {
+  int64 productId = 1;
+  int32 quantity = 2;
+  google.protobuf.Timestamp createdAt = 3;
+  google.protobuf.Timestamp updatedAt = 4;
+}
+
+message GetByProductIdRequest {
+  int64 productId = 1;
+}
+
+service InventoryService {
+  rpc GetInventoryByProductId(GetByProductIdRequest) returns (InventoryResponse);
+}
